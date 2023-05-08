@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lrt.syoa.mapper.PeoMapper">
+
+    <select id="getList" resultType="com.lrt.syoa.entity.Peo">
+        select * from sys_peo
+        <where>
+            <if test="name!=null and name!='' ">
+                name like concat("%",#{name},"%")
+            </if>
+            <if test="age!=null and age!='' ">
+                and age like concat("%",#{age},"%")
+            </if>
+            <if test="addr!=null and addr!='' ">
+                and addr like concat("%",#{addr},"%")
+            </if>
+        </where>
+        order by id desc limit #{pageNum}, #{pageSize}
+    </select>
+
+    <select id="getTotal" resultType="integer">
+        select count(id) from sys_peo
+        <where>
+            <if test="name!=null and name!='' ">
+                name like concat("%",#{name},"%")
+            </if>
+            <if test="age!=null and age!='' ">
+                and age like concat("%",#{age},"%")
+            </if>
+            <if test="addr!=null and addr!='' ">
+                and addr like concat("%",#{addr},"%")
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>
