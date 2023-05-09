@@ -187,7 +187,7 @@
                 getPeoList()
             }
             const handleSelectionChange = (val) => {
-                
+                // TODO 发送id的数组
             }
             return {
                 list,
