@@ -37,22 +37,22 @@
     <el-dialog v-model="dialogFormVisible" title="人员信息" width="30%">
         <el-form label-width="100px">
             <el-form-item label="姓名">
-                <el-input v-model="form.value.name" autocomplete="off" />
+                <el-input v-model="pform.name" autocomplete="off" />
             </el-form-item>
             <el-form-item label="年龄">
-                <el-input v-model="form.value.age" autocomplete="off" />
+                <el-input v-model="pform.age" autocomplete="off" />
             </el-form-item>
             <el-form-item label="性别">
-                <el-radio-group v-model="form.value.sex">
+                <el-radio-group v-model="pform.sex">
                     <el-radio label="男" />
                     <el-radio label="女" />
                 </el-radio-group>
             </el-form-item>
             <el-form-item label="出生日期">
-                <el-date-picker v-model="form.value.birth" type="date" placeholder="请选择你的出生日期" style="width: 100%" />
+                <el-date-picker v-model="pform.birth" type="date" placeholder="请选择你的出生日期" style="width: 100%" />
             </el-form-item>
             <el-form-item label="住址">
-                <el-input v-model="form.value.addr" autocomplete="off" />
+                <el-input v-model="pform.addr" autocomplete="off" />
             </el-form-item>
         </el-form>
         <template #footer>
@@ -85,7 +85,7 @@
             const age = ref()
             const addr = ref()
             const dialogFormVisible = ref(false)
-            const form = reactive({
+            const pform = reactive({
                 id: null,
                 name: '',
                 age: '',
@@ -134,16 +134,16 @@
             }
             const addPeo = async () => {
                 let param = {
-                    name: form.value.name,
-                    age: form.value.age,
-                    sex: form.value.sex,
-                    birth: form.value.birth,
-                    addr: form.value.addr
+                    name: pform.name,
+                    age: pform.age,
+                    sex: pform.sex,
+                    birth: pform.birth,
+                    addr: pform.addr
                 }
                 // 如果是编辑的话，就在请求参数中加上id
                 if(isEdit.value == true){
-                    param.id = form.value.id
-                } 
+                    param.id = pform.id
+                }
                 let res = await proxy.$api.savePeo(param)
                 if (res.data == 1) {
                     ElMessage({
@@ -158,7 +158,7 @@
                 isEdit.value = false // 将isEdit重置为false,避免下次新增数据提交了id
             }
             const editPeo = async (row) => {
-                form.value = JSON.parse(JSON.stringify(row)) // 将行中的数据赋给form JSON.parse(JSON.stringify(row))使双向绑定暂时失效
+                pform.value = JSON.parse(JSON.stringify(row)) // 将行中的数据赋给pform JSON.parse(JSON.stringify(row))使双向绑定暂时失效
                 isEdit.value = true
                 dialogFormVisible.value = true
             }
@@ -200,7 +200,7 @@
                 age,
                 addr,
                 dialogFormVisible,
-                form,
+                pform,
                 handleSizeChange,
                 handleCurrentChange,
                 getPeoList,
