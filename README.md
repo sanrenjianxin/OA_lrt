@@ -7,7 +7,7 @@
 
 ## 分析页面结构
 
-![image-20230323221931611](C:\2021-\work\笔记\vue3\vue3\image-20230323221931611.png)
+![image-20230323221931611](README\image-20230323221931611.png)
 
 - 左侧和头部是侧边栏，且不随url变化而变化，用两个组件实现，同时挂载到根路由上
 - 中间是随url变化的，目前界面内是个人中心，可以设置一个跟路由的子路由，切换中心界面
@@ -193,11 +193,11 @@
 
 
 ​    
-    const router = createRouter({
-      history: createWebHashHistory(),
-      routes
-    })
-    
+​    const router = createRouter({
+​      history: createWebHashHistory(),
+​      routes
+​    })
+​    
     export default router
     ```
 
@@ -287,7 +287,7 @@
 
 - 第三步：fastmock网站编辑接口
 
-  - ![image-20230326111313645](C:\2021-\work\笔记\vue3\vue3\image-20230326111313645.png)
+  - ![image-20230326111313645](README\image-20230326111313645.png)
 
 - 第四步：准备axios函数发送ajax请求（url从fastmock网站获取），组件挂载时调用发送请求函数
 
@@ -701,7 +701,7 @@
 
 - 编写service，但是由于update数据时，如果请求中提交的User部分数据为空，如下图中只有email的数据，如果还使用注解方式写静态sql的话，会导致将id为3的字段中email数据修改后，此字段的其他数据被修改为null的情况，而我们的需求很明显是只修改email的数据
 
-  ![image-20230429154630077](D:\SV项目文档\springboot+vue3\image-20230429154630077.png)
+  ![image-20230429154630077](README\image-20230429154630077.png)
 
 - 所以我们要采用xml方式编写动态sql的方式来判断前端给的数据是否为空，为空则不修改原本数据
 
@@ -773,7 +773,7 @@
 
 - 此时运行发现报错
 
-  ![image-20230429155510866](D:\SV项目文档\springboot+vue3\image-20230429155510866.png)
+  ![image-20230429155510866](README\image-20230429155510866.png)
 
 - 发现是xml文件没有交给springboot去扫描
 

@@ -7,7 +7,7 @@
     </div>
     <div class="user-header" style="margin: 10px 0;">
         <el-button type="primary" @click="dialogFormVisible = true">+新增</el-button>
-        <el-button type="danger">-批量删除</el-button>
+        <el-button type="danger" @click="batchDelete">-批量删除</el-button>
         <el-button type="primary">导入<el-icon>
                 <Upload />
             </el-icon></el-button>
@@ -85,6 +85,7 @@
             const age = ref()
             const addr = ref()
             const dialogFormVisible = ref(false)
+            const mutiSelection = ref() // 批量删除的数据
             const pform = reactive({
                 id: null,
                 name: '',
@@ -187,7 +188,22 @@
                 getPeoList()
             }
             const handleSelectionChange = (val) => {
-                // TODO 发送id的数组
+                mutiSelection.value = val
+            }
+            // 点击批量删除按钮
+            const batchDelete = async () => {
+                // 转换为id数组
+                const ids = mutiSelection.value.map(v => v.id)
+                if (ids.length > 0){
+                    let res = await proxy.$api.batchDel(ids);
+                    if (res.data == ids.length){
+                        ElMessage({
+                            message: '批量删除成功',
+                            type: 'success',
+                        })
+                        getPeoList()
+                    }
+                }
             }
             return {
                 list,
@@ -207,7 +223,8 @@
                 addPeo,
                 editPeo,
                 deletePeo,
-                handleSelectionChange
+                handleSelectionChange,
+                batchDelete
             }
         }
     }

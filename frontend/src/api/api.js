@@ -43,5 +43,13 @@ export default {
             data: params,
             mock: true
         })
+    },
+    batchDel(params) {
+        return request({
+            url: '/people/batchDel',
+            method: 'delete',
+            data: params,
+            mock: true
+        })
     }
 }
