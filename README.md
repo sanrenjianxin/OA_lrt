@@ -7,7 +7,7 @@
 
 ## 分析页面结构
 
-![image-20230323221931611](README\image-20230323221931611.png)
+![image-20230323221931611](README/image-20230323221931611.png)
 
 - 左侧和头部是侧边栏，且不随url变化而变化，用两个组件实现，同时挂载到根路由上
 - 中间是随url变化的，目前界面内是个人中心，可以设置一个跟路由的子路由，切换中心界面
@@ -198,8 +198,8 @@
 ​      routes
 ​    })
 ​    
-    export default router
-    ```
+​    export default router
+​    ```
 
 
 ## home组件ui编写
@@ -287,7 +287,7 @@
 
 - 第三步：fastmock网站编辑接口
 
-  - ![image-20230326111313645](README\image-20230326111313645.png)
+  - ![image-20230326111313645](README/image-20230326111313645.png)
 
 - 第四步：准备axios函数发送ajax请求（url从fastmock网站获取），组件挂载时调用发送请求函数
 
@@ -701,7 +701,7 @@
 
 - 编写service，但是由于update数据时，如果请求中提交的User部分数据为空，如下图中只有email的数据，如果还使用注解方式写静态sql的话，会导致将id为3的字段中email数据修改后，此字段的其他数据被修改为null的情况，而我们的需求很明显是只修改email的数据
 
-  ![image-20230429154630077](README\image-20230429154630077.png)
+  ![image-20230429154630077](README/image-20230429154630077.png)
 
 - 所以我们要采用xml方式编写动态sql的方式来判断前端给的数据是否为空，为空则不修改原本数据
 
@@ -773,7 +773,7 @@
 
 - 此时运行发现报错
 
-  ![image-20230429155510866](README\image-20230429155510866.png)
+  ![image-20230429155510866](README/image-20230429155510866.png)
 
 - 发现是xml文件没有交给springboot去扫描
 
@@ -1192,3 +1192,116 @@
 
 - 批量删除
 
+  - 功能描述：选择记录前的多选框，点击批量删除按钮，删除数据
+
+  - ![image-20230510085652794](README/image-20230510085652794.png)
+
+  - 点击多选框后，前端获取选中的数据中的ids数组，传给后端，后端service调用delete mapper删除数据
+
+  - 前端需要判断ids数组是否为空，避免发送多余请求
+
+  - ```js
+    const handleSelectionChange = (val) => {
+        mutiSelection.value = val
+    }
+    // 点击批量删除按钮
+    const batchDelete = async () => {
+    // 转换为id数组
+        const ids = mutiSelection.value.map(v => v.id)
+        	if (ids.length > 0){
+                let res = await proxy.$api.batchDel(ids);
+                if (res.data == ids.length){
+                    ElMessage({
+                    message: '批量删除成功',
+                    type: 'success',
+                    })
+                    getPeoList()
+        	}
+        }
+    }
+    ```
+
+  - ```java
+    @DeleteMapping("/batchDel")
+    public Integer batch(@RequestBody List<Integer> ids){
+    	return peoService.batchDel(ids);
+    }
+    
+    public Integer batchDel(List<Integer> ids) {
+        Integer num = 0;
+        for (Integer id : ids) {
+        	num += peoMapper.deleteById(id);
+        }
+        return num;
+    }
+    ```
+
+    
+
+## 实现导入导出
+
+- 引入hutool[入门和安装 (hutool.cn)](https://hutool.cn/docs/#/)
+
+  ```xml
+  <!--            hutool -->
+          <dependency>
+              <groupId>cn.hutool</groupId>
+              <artifactId>hutool-all</artifactId>
+              <version>5.8.16</version>
+          </dependency>
+          <dependency>
+              <groupId>org.apache.poi</groupId>
+              <artifactId>poi-ooxml</artifactId>
+              <version>4.1.2</version>
+          </dependency>
+  ```
+
+- 实现导出：
+
+  - 后端：利用hutool ExcelUtil工具类，从数据库中查询所有数据，写入到输出流中即可；
+  - 前端：导出按钮绑定函数window.open后端接口，以下是service中的代码
+
+  ```java
+  public void export(HttpServletResponse response) throws IOException {
+          // 从数据库中查询出所有数据
+          List<Peo> peoList = peoMapper.findAll();
+          // 在内存操作 写出到浏览器
+          ExcelWriter writer = ExcelUtil.getWriter("true");
+          // 一次性写出内容，使用默认样式，强制输出标题
+          writer.write(peoList, true);
+          //response为HttpServletResponse对象
+          response.setContentType("application/vnd.ms-excel;charset=utf-8");
+          String filename = URLEncoder.encode("人员名单", "UTF-8");
+          //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
+          response.setHeader("Content-Disposition","attachment;filename="+filename+".xls");
+          ServletOutputStream out = response.getOutputStream();
+  
+          writer.flush(out, true);
+          //此处记得关闭输出Servlet流
+          out.close();
+          // 关闭writer，释放内存
+          writer.close();
+      }
+  ```
+
+- 导入：
+
+  - 后端：接收Post请求参数MultipartFile，获取文件输入流，同样用hutool提供的ExcelUtil工具类通过javabean的方式读取excel中数据
+
+    ```java
+    @PostMapping("/import")
+        public boolean imp(MultipartFile file) throws Exception{
+            InputStream inputStream = file.getInputStream();
+            ExcelReader reader = ExcelUtil.getReader(inputStream);
+            // 通过javabean的方式读取excel数据, 要求必须要和javabean中的属性对应起来
+            List<Peo> list = reader.readAll(Peo.class);
+            peoService.saveBatch(list);
+            return true;
+        }
+    ```
+
+    
+
+  - 前端：使用element-plus的upload组件，在action里指定后端接口即可
+
+## 登录实现

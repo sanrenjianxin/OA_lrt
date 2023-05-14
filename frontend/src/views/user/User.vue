@@ -8,10 +8,14 @@
     <div class="user-header" style="margin: 10px 0;">
         <el-button type="primary" @click="dialogFormVisible = true">+新增</el-button>
         <el-button type="danger" @click="batchDelete">-批量删除</el-button>
-        <el-button type="primary">导入<el-icon>
+        <el-upload v-model:file-list="fileList" class="upload-demo"
+            action="http://localhost:8080/people/import" :show-file-list="false" style="display: inline-block;" :on-success="handleImpsuccess">
+            <el-button type="primary" style="margin:0 10px;">导入<el-icon>
                 <Upload />
             </el-icon></el-button>
-        <el-button type="primary">导出<el-icon>
+        </el-upload>
+        
+        <el-button type="primary" @click="exp">导出<el-icon>
                 <Download />
             </el-icon></el-button>
     </div>
@@ -142,7 +146,7 @@
                     addr: pform.addr
                 }
                 // 如果是编辑的话，就在请求参数中加上id
-                if(isEdit.value == true){
+                if (isEdit.value == true) {
                     param.id = pform.id
                 }
                 let res = await proxy.$api.savePeo(param)
@@ -194,9 +198,9 @@
             const batchDelete = async () => {
                 // 转换为id数组
                 const ids = mutiSelection.value.map(v => v.id)
-                if (ids.length > 0){
+                if (ids.length > 0) {
                     let res = await proxy.$api.batchDel(ids);
-                    if (res.data == ids.length){
+                    if (res.data == ids.length) {
                         ElMessage({
                             message: '批量删除成功',
                             type: 'success',
@@ -204,6 +208,18 @@
                         getPeoList()
                     }
                 }
+            }
+            // 导出按钮
+            const exp = () => {
+                window.open("http://localhost:8080/people/export")
+            }
+            // 导入成功后执行
+            const handleImpsuccess = () => {
+                ElMessage({
+                    message: '导入成功',
+                    type: 'success',
+                })
+                getPeoList()
             }
             return {
                 list,
@@ -224,7 +240,9 @@
                 editPeo,
                 deletePeo,
                 handleSelectionChange,
-                batchDelete
+                batchDelete,
+                exp,
+                handleImpsuccess
             }
         }
     }

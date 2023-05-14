@@ -22,4 +22,7 @@ public interface PeoMapper {
 
     @Delete("delete from sys_peo where id = #{id}")
     Integer deleteById(@Param("id") Integer id);
+
+    @Select("select * from sys_peo")
+    List<Peo> findAll();
 }
