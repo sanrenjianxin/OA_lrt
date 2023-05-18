@@ -5,7 +5,7 @@
             <el-input size="medium" style="margin: 10px 0;height: 40px;" prefix-icon="User" v-model="user.username"></el-input>
             <el-input size="medium" style="margin: 10px 0;height: 40px;" prefix-icon="Lock" show-password v-model="user.password"></el-input>
             <div style="margin: 10px 0; text-align: right;">
-                <el-button type="primary" size="medium" autocomplete="off">登录</el-button>
+                <el-button type="primary" size="medium" autocomplete="off" @click="login">登录</el-button>
                 <el-button type="warning" size="medium" autocomplete="off">注册</el-button>
             </div>
         </div>
@@ -14,15 +14,42 @@
 <script>
     import {User, Lock} from "@element-plus/icons-vue"
     import { onMounted, ref, reactive } from 'vue'
-    
+    import { getCurrentInstance } from 'vue'
+    import { ElMessage } from 'element-plus'
+
     export default {
         setup() {
+            const { proxy } = getCurrentInstance()
             const user = reactive({
                 username: null,
                 password: null
             })
+            const login = async () => {
+                if (user.username == null || user.password == null){
+                    ElMessage({
+                        message: '用户名或密码不能为空',
+                        type: 'error'
+                    })
+                    return;
+                }
+                let param = {
+                    username: user.username,
+                    password: user.password
+                }
+                let res = await proxy.$api.userLogin(param)
+                if(res.data.code === '200'){
+                    proxy.$router.push("/")
+                }
+                else {
+                    ElMessage({
+                        message: res.data.msg,
+                        type: 'error'
+                    })
+                }
+            }
             return {
-                user
+                user,
+                login
             }
         }
     }

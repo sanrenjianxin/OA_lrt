@@ -1,5 +1,9 @@
 package com.lrt.syoa.controller;
 
+import cn.hutool.core.util.StrUtil;
+import com.lrt.syoa.common.Constants;
+import com.lrt.syoa.common.Result;
+import com.lrt.syoa.controller.dto.UserDTO;
 import com.lrt.syoa.entity.User;
 import com.lrt.syoa.mapper.UserMapper;
 import com.lrt.syoa.service.UserService;
@@ -54,6 +58,17 @@ public class UserController {
         Integer total = userMapper.selectTotal();
         res.put("total", total);
         return res;
+    }
+
+    @PostMapping("/login")
+    public Result login(@RequestBody UserDTO userDTO) {
+        String username = userDTO.getUsername();
+        String password = userDTO.getPassword();
+        // 使用hutool工具类
+        if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+            return Result.error(Constants.CODE_400, "参数错误");
+        }
+        return Result.success(userService.login(userDTO));
     }
 
 

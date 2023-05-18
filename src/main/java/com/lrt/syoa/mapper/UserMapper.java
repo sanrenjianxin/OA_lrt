@@ -1,5 +1,6 @@
 package com.lrt.syoa.mapper;
 
+import com.lrt.syoa.controller.dto.UserDTO;
 import com.lrt.syoa.entity.User;
 import org.apache.ibatis.annotations.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -7,8 +8,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import java.util.List;
 
 /*
-* 把UserMapper这个Dao交给Spring管理
-* 自动生成实现类*/
+ * 把UserMapper这个Dao交给Spring管理
+ * 自动生成实现类*/
 @Mapper
 public interface UserMapper {
 
@@ -25,9 +26,12 @@ public interface UserMapper {
     Integer deleteById(@Param("id") Integer id);
 
     @Select("select * from sys_user limit #{pageNum}, #{pageSize}")
-    List<User> selectPage(@Param("pageNum") Integer pageNum,@Param("pageSize") Integer pageSize);
+    List<User> selectPage(@Param("pageNum") Integer pageNum, @Param("pageSize") Integer pageSize);
 
     @Select("select count(*) from sys_user")
     Integer selectTotal();
+
+    @Select("select * from sys_user where username = #{username} and password = #{password} limit 1")
+    User login(UserDTO userDTO);
 
 }

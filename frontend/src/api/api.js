@@ -51,5 +51,13 @@ export default {
             data: params,
             mock: true
         })
+    },
+    userLogin(params) {
+        return request({
+            url: '/user/login',
+            method: 'post',
+            data: params,
+            mock: true
+        })
     }
 }

@@ -1305,3 +1305,118 @@
   - 前端：使用element-plus的upload组件，在action里指定后端接口即可
 
 ## 登录实现
+
+## 封装统一结果集和自定义异常
+
+- **为什么要封装统一结果集**？
+
+- Java后端开发项目时，需要给前端传一些数据，可以直接将一个List或者Map返回给前端，但是这样会显得很乱，并且有时候前端需要的不仅仅只是数据，可能还有一些错误码、错误信息等，这时就需要一种规范的数据格式传到前端。
+
+  - 先定义一个状态码的接口
+
+    ```java
+    public interface Constants {
+    
+        String CODE_200 = "200"; // 成功
+        String CODE_500 = "500"; // 系统错误
+        String CODE_401 = "401"; // 权限不足
+        String CODE_400 = "400"; // 参数错误
+        String CODE_600 = "600"; // 其他业务错误
+    
+    }
+    ```
+
+  - 编写统一返回结果集
+
+    ```java
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class Result {
+        private String code;
+        private String msg;
+        private Object data;
+    
+        public static Result success() {
+            return new Result(Constants.CODE_200, "", null);
+        }
+    
+        public static Result success(Object data){
+            return new Result(Constants.CODE_200, "", data);
+        }
+    
+        public static Result error(String code, String msg){
+            return new Result(code, msg, null);
+        }
+    
+        public static Result error(){
+            return new Result(Constants.CODE_500, "系统错误", null);
+        }
+    
+    }
+    ```
+
+- **SpringBoot自定义异常**
+
+  - 新建全局异常处理器GlobalExceptionHandler添加@ControllerAdvice自定义全局异常
+
+    ```java
+    @ControllerAdvice
+    public class GlobalExceptionHandler {
+        /**
+         *
+         * @param se 业务异常
+         * @return
+         */
+        @ExceptionHandler(ServiceException.class)
+        @ResponseBody
+        public Result handle(ServiceException se){
+            return Result.error(se.getCode(), se.getMessage());
+        }
+    
+    }
+    ```
+
+  - 自定义一个异常类，继承RuntimeException，编写一个构造方法
+
+    ```java
+    @Getter
+    public class ServiceException extends RuntimeException {
+        private String code;
+        public ServiceException(String code, String msg){
+            super(msg);
+            this.code = code;
+        }
+    }
+    ```
+
+  - 在Service中使用自定义异常
+
+    ```java
+    public UserDTO login(UserDTO userDTO) {
+        User one = userMapper.login(userDTO);
+        if (one != null) {
+            BeanUtil.copyProperties(one, userDTO, true); // 浅拷贝User对象中的数据到userDTO中,忽略userDTO中没有的数据
+            return userDTO;
+        } else {
+            throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
+        }
+    }
+    ```
+
+  - 前端统一处理
+
+    ```js
+    if(res.data.code === '200'){
+        	proxy.$router.push("/")
+    }
+    else {
+        ElMessage({
+            message: res.data.msg,
+            type: 'error'
+        })
+    }
+    ```
+
+    
+
