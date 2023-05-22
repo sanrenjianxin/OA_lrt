@@ -16,6 +16,9 @@ public interface UserMapper {
     @Select("select * from sys_user")
     List<User> findAll();
 
+    @Select("select * from sys_user where id = #{id} limit 1")
+    User getById(@Param("id") Integer id);
+
     @Insert("insert into sys_user(username, password, nickname, email, phone) VALUES (#{username}, #{password}, " +
             "#{nickname}, #{email}, #{phone})")
     int insert(User user);

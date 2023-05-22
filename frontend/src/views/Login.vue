@@ -13,13 +13,15 @@
 </template>
 <script>
     import {User, Lock} from "@element-plus/icons-vue"
-    import { onMounted, ref, reactive } from 'vue'
-    import { getCurrentInstance } from 'vue'
+    import { onMounted, ref, reactive,getCurrentInstance } from 'vue'
     import { ElMessage } from 'element-plus'
+    import { useStore} from 'vuex'
+
 
     export default {
         setup() {
             const { proxy } = getCurrentInstance()
+            const store = useStore()
             const user = reactive({
                 username: null,
                 password: null
@@ -39,6 +41,9 @@
                 let res = await proxy.$api.userLogin(param)
                 if(res.data.code === '200'){
                     proxy.$router.push("/")
+                    store.commit('updateToken', res.data.data.token)
+                    store.commit('updateUsername', res.data.data.username)
+                    store.commit('updateUid', res.data.data.id)
                 }
                 else {
                     ElMessage({
@@ -47,6 +52,16 @@
                     })
                 }
             }
+            const isLogin = () => {
+                // 如果存在token 直接跳转到首页
+                if (store.state.token) {
+                    proxy.$router.push("/")
+                }
+            }    
+
+            onMounted(() => {
+                isLogin()
+            })
             return {
                 user,
                 login

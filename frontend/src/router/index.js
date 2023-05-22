@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import store from '../stores'
 
 const routes = [
   {
@@ -10,6 +11,11 @@ const routes = [
         path: '/home',
         name: 'home',
         component: () => import('../views/home/Home.vue')
+      },
+      {
+        path: '/userCen',
+        name: 'userCen',
+        component: () => import('../views/UserCen.vue')
       },
       {
         path: '/user',
@@ -38,6 +44,18 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// 导航守卫
+router.beforeEach((to, from, next) => {
+  // 如果不存在 token
+  if (!store.state.token) {
+    // 如果跳转的不是登录页
+    if (to.path !== '/login') {
+        return next('/login')
+    }
+  }
+  next()
 })
 
 export default router

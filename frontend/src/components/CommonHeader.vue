@@ -18,7 +18,7 @@
             </span>
             <template #dropdown>
                 <el-dropdown-menu>
-                    <el-dropdown-item>个人中心</el-dropdown-item>
+                    <el-dropdown-item><router-link to="/userCen" style="text-decoration: none;">个人中心</router-link></el-dropdown-item>
                     <el-dropdown-item>
                         <router-link to="/login" style="text-decoration: none;">退出</router-link>
                     </el-dropdown-item>

@@ -71,5 +71,13 @@ public class UserController {
         return Result.success(userService.login(userDTO));
     }
 
+    @GetMapping("/index")
+    public Result getUserInfo(@RequestParam Integer id) {
+        User user = userMapper.getById(id);
+        if (user == null) {
+            return Result.error(Constants.CODE_400, "找不到用户");
+        }
+        return Result.success(user);
+    }
 
 }

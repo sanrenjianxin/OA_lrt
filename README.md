@@ -1304,8 +1304,6 @@
 
   - 前端：使用element-plus的upload组件，在action里指定后端接口即可
 
-## 登录实现
-
 ## 封装统一结果集和自定义异常
 
 - **为什么要封装统一结果集**？
@@ -1420,3 +1418,129 @@
 
     
 
+## JWT实现登录拦截
+
+### 后端Spring Boot 集成JWT
+
+- 导入maven依赖
+
+  ```xml
+  <!---jwt-->
+          <dependency>
+              <groupId>com.auth0</groupId>
+              <artifactId>java-jwt</artifactId>
+              <version>3.4.0</version>
+          </dependency>
+  ```
+
+- utils/JWTUtils 配置JWT工具类
+
+  ```java
+  public class JWTUtils {
+  
+      public static String getToken(String userId, String sign) {
+          return JWT.create().withAudience(userId) // 将userID保存到 token 里面,作为载荷
+                  .withExpiresAt(DateUtil.offsetHour(new Date(), 2)) // 两小时后 token 过期
+                  .sign(Algorithm.HMAC256(sign)); // 以sign作为密钥
+      }
+  
+  }
+  ```
+
+  
+
+- config/InterceptorConfig配置全局拦截器
+
+  ```java
+  @Configuration
+  public class InterceptorConfig implements WebMvcConfigurer {
+      @Override
+      public void addInterceptors(InterceptorRegistry registry) {
+          registry.addInterceptor(jwtInterceptor())
+                  .addPathPatterns("/**")  // 拦截所有请求, 通过判断 token 是否合法来决定是否登录
+                  .excludePathPatterns("/user/login", "/file/**"); // 放行 login 请求
+      }
+      @Bean
+      public JwtInterceptor jwtInterceptor() {
+          return new JwtInterceptor();
+      }
+  }
+  ```
+
+- config/interceptor/JwtInterceptor配置JWT拦截器
+
+  ```java
+  public class JwtInterceptor implements HandlerInterceptor {
+  
+      @Autowired
+      UserService userService;
+  
+      @Override
+      public boolean preHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object handler){
+          String token = httpServletRequest.getHeader("token");// 从 http 请求头中取出 token
+          // 如果不是映射到方法直接通过
+          if(!(handler instanceof HandlerMethod)){
+              return true;
+          }
+          // 执行认证
+          if (StrUtil.isBlank(token)) {
+              throw new ServiceException(Constants.CODE_401, "无token,请重新登录");
+          }
+          // 获取 token 中的userID
+          String userId;
+          try {
+              userId = JWT.decode(token).getAudience().get(0);
+          } catch (JWTDecodeException j) {
+              throw new ServiceException(Constants.CODE_401, "token 权限验证失败, 请重新登录");
+          }
+          // 根据token 中的userID查询数据库
+          User user = userService.getById(Integer.parseInt(userId));
+          if (user == null) {
+              throw new ServiceException(Constants.CODE_401, "用户不存在, 请重新登录");
+          }
+          // 用户密码加签验证 token
+          JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(user.getPassword())).build();
+          try {
+              jwtVerifier.verify(token); // 验证 token
+          } catch (JWTVerificationException e) {
+              throw new ServiceException(Constants.CODE_401, "token 权限验证失败, 请重新登录");
+          }
+          return true;
+      }
+  }
+  ```
+
+### 后端登录接口
+
+- Controller
+
+  ```java
+  @PostMapping("/login")
+      public Result login(@RequestBody UserDTO userDTO) {
+          String username = userDTO.getUsername();
+          String password = userDTO.getPassword();
+          // 使用hutool工具类
+          if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+              return Result.error(Constants.CODE_400, "参数错误");
+          }
+          return Result.success(userService.login(userDTO));
+      }
+  ```
+
+- Service
+
+  ```java
+  public UserDTO login(UserDTO userDTO) {
+          User one = userMapper.login(userDTO);
+          if (one != null) {
+              BeanUtil.copyProperties(one, userDTO, true); // 浅拷贝User对象中的数据到userDTO中,忽略userDTO中没有的数据
+              String token = JWTUtils.getToken(one.getId().toString(), one.getPassword());// 以用户id为载荷, password为密钥生成token
+              userDTO.setToken(token);
+              return userDTO;
+          } else {
+              throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
+          }
+      }
+  ```
+
+  

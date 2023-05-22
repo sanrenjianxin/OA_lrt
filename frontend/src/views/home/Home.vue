@@ -70,10 +70,10 @@
                 countData.value = res
             }
             // 组件挂载时调用发送请求函数
-            onMounted(() => {
-                getTableList()
-                getCountData()
-            })
+            // onMounted(() => {
+            //     getTableList()
+            //     getCountData()
+            // })
             // 关于echarts表格的渲染部分
             
             return {

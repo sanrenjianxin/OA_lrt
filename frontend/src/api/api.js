@@ -59,5 +59,13 @@ export default {
             data: params,
             mock: true
         })
+    },
+    getIUserInfo(params) {
+        return request({
+            url: '/user/index',
+            method: 'get',
+            data: params,
+            mock: true
+        })
     }
 }
