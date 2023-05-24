@@ -67,5 +67,13 @@ export default {
             data: params,
             mock: true
         })
+    },
+    commitRate(params) {
+        return request({
+            url: '/rate/commit',
+            method: 'post',
+            data: params,
+            mock: true
+        })
     }
 }

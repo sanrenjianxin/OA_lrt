@@ -1543,4 +1543,86 @@
       }
   ```
 
+### 前端
+
+- **持久化token和用户信息**
+
+  stores/index.js vuex中引入持久化插件将token存储到localStorage中
+
+  ```js
+  import { createStore } from 'vuex'
+  import creteState from 'vuex-persistedstate'
   
+  export default createStore({
+      // 配置哪些状态需要持久化
+      plugins: [creteState({
+          storage: window.localStorage,
+          reducer (state) {
+            return {
+              token: state.token,
+              username: state.username,
+              uid: state.uid
+            }
+          }
+        }
+      )],
+      state: {
+          token: null,
+          username: null,
+          uid: null
+      },
+      mutations: {
+          updateToken(state, token) {
+              state.token = token
+          },
+          updateUsername(state, username) {
+              state.username = username
+          },
+          updateUid(state, uid) {
+              state.uid = uid
+          },
+      }
+  })
+  ```
+
+- **封装axios设置请求拦截器在每次发送请求时请求头中附带token**
+
+  api/request.js
+
+  ```js
+  // 添加请求拦截器
+  service.interceptors.request.use(function (config) {
+      if (store.state.token) {
+        config.headers.token = store.state.token
+      }
+      return config;
+    }, function (error) {
+      // 对请求错误做些什么
+      return Promise.reject(error);
+    });
+  ```
+
+- **配置导航守卫拦截没有token的前端路由**
+
+  router/index.js
+
+  ```js
+  // 导航守卫
+  router.beforeEach((to, from, next) => {
+    // 如果不存在 token
+    if (!store.state.token) {
+      // 如果跳转的不是登录页
+      if (to.path !== '/login') {
+          return next('/login')
+      }
+    }
+    next()
+  })
+  ```
+
+## 文件上传
+
+### 后端
+
+- 
+

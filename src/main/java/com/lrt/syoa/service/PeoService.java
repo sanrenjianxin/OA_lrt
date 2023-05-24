@@ -2,14 +2,17 @@ package com.lrt.syoa.service;
 
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
+import com.lrt.syoa.common.Result;
 import com.lrt.syoa.entity.MessageId;
 import com.lrt.syoa.entity.Peo;
 import com.lrt.syoa.mapper.PeoMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -23,11 +26,14 @@ public class PeoService {
     @Autowired
     private PeoMapper peoMapper;
 
-    public Map<String, Object> getList(Integer pageNum, Integer pageSize, String name, Integer age, String addr) {
+    @Value("${files.upload.path}")
+    private String fileUploadPath;
+
+    public Map<String, Object> getList(Integer pageNum, Integer pageSize, String name, Integer age, Double rate) {
         pageNum = (pageNum - 1) * pageSize;
         Map<String, Object> res = new HashMap<>();
-        List<Peo> peoList = peoMapper.getList(pageNum, pageSize, name, age, addr);
-        Integer total = peoMapper.getTotal(name, age, addr);
+        List<Peo> peoList = peoMapper.getList(pageNum, pageSize, name, age, rate);
+        Integer total = peoMapper.getTotal(name, age, rate);
         res.put("total", total);
         res.put("peoList", peoList);
         return res;
@@ -82,5 +88,20 @@ public class PeoService {
         out.close();
         // 关闭writer，释放内存
         writer.close();
+    }
+
+    public Result deleteById(Integer id) {
+        // 根据id 获取要删除文件的名字
+        String fileName = peoMapper.selectIMGById(id);
+        // 凭借文件所在地址
+        String filePath = fileUploadPath + fileName;
+        // 如果文件存在则删除文件
+        File file = new File(filePath);
+        if (file.exists()) {
+            file.delete();
+        }
+        // 根据 id删除数据库记录
+        peoMapper.deleteById(id);
+        return Result.success();
     }
 }

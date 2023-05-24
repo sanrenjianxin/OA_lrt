@@ -70,13 +70,13 @@
                     url: "UserManage/UserManage",
                 },
                 {
-                    label: "其他",
+                    label: "主要功能",
                     icon: "location",
                     children: [
                         {
-                            path: "/page1",
-                            name: "page1",
-                            label: "首页",
+                            path: "/rate",
+                            name: "rate",
+                            label: "评分",
                             icon: "setting",
                             url: "Other/PageOne",
                         },

@@ -2,19 +2,19 @@
     <div class="search" style="padding: 10px 0;">
         <el-input :suffix-icon="Search" style="width: 200px" placeholder="姓名" v-model="name" />
         <el-input :suffix-icon="Search" style="width: 200px; margin-left: 10px;" placeholder="年龄" v-model="age" />
-        <el-input :suffix-icon="Search" style="width: 200px; margin-left: 10px;" placeholder="住址" v-model="addr" />
+        <el-input :suffix-icon="Search" style="width: 200px; margin-left: 10px;" placeholder="评分" v-model="rate" />
         <el-button style="margin-left: 10px;" type="primary" @click="getPeoList">搜索</el-button>
     </div>
     <div class="user-header" style="margin: 10px 0;">
         <el-button type="primary" @click="dialogFormVisible = true">+新增</el-button>
         <el-button type="danger" @click="batchDelete">-批量删除</el-button>
-        <el-upload v-model:file-list="fileList" class="upload-demo"
-            action="http://localhost:8080/people/import" :show-file-list="false" style="display: inline-block;" :on-success="handleImpsuccess">
+        <el-upload class="upload-demo" action="http://localhost:8080/people/import" :show-file-list="false"
+            style="display: inline-block;" :on-success="handleImpsuccess">
             <el-button type="primary" style="margin:0 10px;">导入<el-icon>
-                <Upload />
-            </el-icon></el-button>
+                    <Upload />
+                </el-icon></el-button>
         </el-upload>
-        
+
         <el-button type="primary" @click="exp">导出<el-icon>
                 <Download />
             </el-icon></el-button>
@@ -24,6 +24,19 @@
             <el-table-column type="selection" width="55" />
             <el-table-column v-for="item in tableLabel" :key="item.prop" :label="item.label" :prop="item.prop"
                 :width="item.width ? item.width : 125" />
+            <el-table-column label="图片" width="120px">
+                <template #default="scope">
+                    <el-image 
+                    v-if="scope.row.img" 
+                    style="width: 70px; height: 70px" 
+                    :src="'http://localhost:8080/file/'+ scope.row.img" 
+                    alt="" 
+                    :fit="fill"
+                    preview-teleported="true"
+                    :preview-src-list="['http://localhost:8080/file/'+ scope.row.img]" >
+                    </el-image>
+                </template>
+            </el-table-column>
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template v-slot="scope">
                     <el-button size="small" @click="editPeo(scope.row)">编辑</el-button>
@@ -55,8 +68,19 @@
             <el-form-item label="出生日期">
                 <el-date-picker v-model="pform.birth" type="date" placeholder="请选择你的出生日期" style="width: 100%" />
             </el-form-item>
-            <el-form-item label="住址">
-                <el-input v-model="pform.addr" autocomplete="off" />
+            <el-form-item label="评分">
+                <el-input v-model="pform.rate" autocomplete="off" />
+            </el-form-item>
+            <el-form-item label="图片">
+                <el-upload class="upload-demo" action="http://localhost:8080/file/upload" :show-file-list="picture"
+                    style="display: inline-block;" :on-success="handleIMGsuccess">
+                    <el-button type="primary" style="margin:0 10px;">上传图片</el-button>
+                    <template #tip>
+                        <div class="el-upload__tip">
+                            jpg/png files with a size less than 500kb
+                        </div>
+                    </template>
+                </el-upload>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -83,11 +107,11 @@
             const isEdit = ref(false) // 判断是编辑还是新增
             const list = ref([])
             const pageNum = ref(1)
-            const pageSize = ref(10)
-            const total = ref(10)
+            const pageSize = ref(5)
+            const total = ref(5)
             const name = ref()
             const age = ref()
-            const addr = ref()
+            const rate = ref()
             const dialogFormVisible = ref(false)
             const mutiSelection = ref() // 批量删除的数据
             const pform = reactive({
@@ -96,7 +120,8 @@
                 age: '',
                 sex: '',
                 birth: '',
-                addr: ''
+                rate: '',
+                img: ''
             })
             const tableLabel = reactive([
                 {
@@ -117,9 +142,9 @@
                     width: 200
                 },
                 {
-                    prop: "addr",
-                    label: "住址",
-                    width: 320
+                    prop: "rate",
+                    label: "评分",
+                    width: 200
                 },
             ])
             onMounted(() => {
@@ -131,7 +156,7 @@
                     pageSize: pageSize.value,
                     name: name.value,
                     age: age.value,
-                    addr: addr.value
+                    rate: rate.value,
                 }
                 let res = await proxy.$api.getPeoList(param)
                 list.value = res.data.peoList
@@ -143,7 +168,8 @@
                     age: pform.age,
                     sex: pform.sex,
                     birth: pform.birth,
-                    addr: pform.addr
+                    rate: pform.rate,
+                    img: pform.img
                 }
                 // 如果是编辑的话，就在请求参数中加上id
                 if (isEdit.value == true) {
@@ -172,7 +198,7 @@
                     id: d_id
                 }
                 let res = await proxy.$api.deletePeo(param)
-                if (res.data == 1) {
+                if (res.data.code === "200") {
                     ElMessage({
                         message: '删除成功',
                         type: 'success',
@@ -221,6 +247,14 @@
                 })
                 getPeoList()
             }
+            // 导入文件成功后获取文件存储名
+            const handleIMGsuccess = (res) => {
+                pform.img = res.data
+                ElMessage({
+                    message: '上传成功',
+                    type: 'success',
+                })
+            }
             return {
                 list,
                 tableLabel,
@@ -230,7 +264,7 @@
                 total,
                 name,
                 age,
-                addr,
+                rate,
                 dialogFormVisible,
                 pform,
                 handleSizeChange,
@@ -242,7 +276,8 @@
                 handleSelectionChange,
                 batchDelete,
                 exp,
-                handleImpsuccess
+                handleImpsuccess,
+                handleIMGsuccess
             }
         }
     }

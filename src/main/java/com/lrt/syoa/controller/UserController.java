@@ -66,7 +66,7 @@ public class UserController {
         String password = userDTO.getPassword();
         // 使用hutool工具类
         if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
-            return Result.error(Constants.CODE_400, "参数错误");
+            return Result.error(Constants.CODE_400, "用户名或密码为空");
         }
         return Result.success(userService.login(userDTO));
     }

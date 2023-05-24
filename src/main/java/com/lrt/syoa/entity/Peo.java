@@ -11,5 +11,6 @@ public class Peo {
     private Integer age;
     private String sex;
     private Date birth;
-    private String addr;
+    private Double rate;
+    private String img;
 }

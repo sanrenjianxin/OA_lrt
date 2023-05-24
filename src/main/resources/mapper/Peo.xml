@@ -12,8 +12,8 @@
             <if test="age!=null and age!='' ">
                 and age like concat("%",#{age},"%")
             </if>
-            <if test="addr!=null and addr!='' ">
-                and addr like concat("%",#{addr},"%")
+            <if test="rate!=null and rate!='' ">
+                and rate like concat("%",#{rate},"%")
             </if>
         </where>
         order by id desc limit #{pageNum}, #{pageSize}
@@ -28,8 +28,8 @@
             <if test="age!=null and age!='' ">
                 and age like concat("%",#{age},"%")
             </if>
-            <if test="addr!=null and addr!='' ">
-                and addr like concat("%",#{addr},"%")
+            <if test="rate!=null and rate!='' ">
+                and rate like concat("%",#{rate},"%")
             </if>
         </where>
     </select>

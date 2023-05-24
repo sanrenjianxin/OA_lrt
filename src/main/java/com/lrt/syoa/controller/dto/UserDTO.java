@@ -8,7 +8,6 @@ import lombok.Data;
 public class UserDTO {
     private Integer id;
     private String username;
-    @JsonIgnore
     private String password;
     private String nickname;
     private String token;

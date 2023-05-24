@@ -2,6 +2,7 @@ package com.lrt.syoa.controller;
 
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
+import com.lrt.syoa.common.Result;
 import com.lrt.syoa.entity.MessageId;
 import com.lrt.syoa.entity.Peo;
 import com.lrt.syoa.mapper.PeoMapper;
@@ -31,8 +32,8 @@ public class PeoController {
     public Map<String, Object> findAll(@RequestParam Integer pageNum, @RequestParam Integer pageSize,
                                        @RequestParam(required = false) String name,
                                        @RequestParam(required = false) Integer age,
-                                       @RequestParam(required = false) String addr) {
-        return peoService.getList(pageNum, pageSize, name, age, addr);
+                                       @RequestParam(required = false) Double rate) {
+        return peoService.getList(pageNum, pageSize, name, age, rate);
     }
 
     @PostMapping("/save")
@@ -41,8 +42,8 @@ public class PeoController {
     }
 
     @DeleteMapping("/delete")
-    public Integer delete(@RequestBody MessageId id) {
-        return peoMapper.deleteById(id.getId());
+    public Result delete(@RequestBody MessageId id) {
+        return peoService.deleteById(id.getId());
     }
 
     @DeleteMapping("/batchDel")
@@ -51,7 +52,7 @@ public class PeoController {
     }
 
     // 导出接口
-    @GetMapping("export")
+    @GetMapping("/export")
     public void export(HttpServletResponse response) throws IOException {
         peoService.export(response);
     }

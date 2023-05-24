@@ -4,6 +4,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
+import com.lrt.syoa.common.Result;
 import com.lrt.syoa.entity.FileDemo;
 import com.lrt.syoa.mapper.FileMapper;
 import jakarta.servlet.ServletOutputStream;
@@ -39,11 +40,10 @@ public class FileController {
      * @throws IOException
      */
     @PostMapping("/upload")
-    public String upload(@RequestParam("file") MultipartFile multipartFile) throws IOException {
+    public Result upload(@RequestParam("file") MultipartFile multipartFile) throws IOException {
         // 获取文件的信息
         String originalFilename = multipartFile.getOriginalFilename();
         String type = FileUtil.extName(originalFilename);
-        long size = multipartFile.getSize();
         // 先存储到磁盘
         File uploadParentFile = new File(fileUploadPath);
         // 判断配置的文件目录是否存在，若不存在创建一个新的文件目录
@@ -54,18 +54,9 @@ public class FileController {
         String uuid = IdUtil.fastSimpleUUID();
         String fileUuid = uuid + StrUtil.DOT + type;
         File uploadFile = new File(fileUploadPath + fileUuid);
-        // 获取文件的url
-        String url = "http://localhost:8080/file/" + fileUuid;
         // 把获取到的文件存储到磁盘目录
         multipartFile.transferTo(uploadFile);
-        // 存储数据库
-        FileDemo fileDemo = new FileDemo();
-        fileDemo.setName(originalFilename);
-        fileDemo.setType(type);
-        fileDemo.setSize(size/1024);
-        fileDemo.setUrl(url);
-        fileMapper.insert(fileDemo);
-        return url;
+        return Result.success(fileUuid);
     }
 
     /**
