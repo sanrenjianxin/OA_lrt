@@ -75,5 +75,13 @@ export default {
             data: params,
             mock: true
         })
+    },
+    getRateInfo(params) {
+        return request({
+            url: '/rate/getRateInfo',
+            method: 'get',
+            data: params,
+            mock: true
+        })
     }
 }

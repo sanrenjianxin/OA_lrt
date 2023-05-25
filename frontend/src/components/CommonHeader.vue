@@ -20,7 +20,7 @@
                 <el-dropdown-menu>
                     <el-dropdown-item><router-link to="/userCen" style="text-decoration: none;">个人中心</router-link></el-dropdown-item>
                     <el-dropdown-item>
-                        <router-link to="/login" style="text-decoration: none;">退出</router-link>
+                        <router-link @click="clearToken()" to="/login" style="text-decoration: none;">退出</router-link>
                     </el-dropdown-item>
                 </el-dropdown-menu>
             </template>
@@ -42,10 +42,17 @@
             const current = computed(() => {
                 return store.state.currentMenu
             })
+            // 清空localStorage里的token和身份信息
+            const clearToken = () => {
+                store.commit("updateToken", null)
+                store.commit("updateUsername", null)
+                store.commit("updateUid", null)
+            }
 
             return {
                 handleCollapse,
-                current
+                current,
+                clearToken
             }
         }
     }

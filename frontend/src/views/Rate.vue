@@ -22,6 +22,7 @@
             <el-table-column fixed="right" label="操作" min-width="180">
                 <template v-slot="scope">
                     <el-button type="warning" round @click="ratePeo(scope.row)">评分</el-button>
+                    <el-button type="primary" round @click="getRateInfo(scope.row)">查看评分记录</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -34,16 +35,40 @@
     </div>
     <!-- 评分模态框 -->
     <el-dialog v-model="dialogFormVisible" title="评分" width="30%">
-        <el-rate
-        size="large"
-        v-model="u_rate"
-        :texts="['正中大菲柱', '缺陷明显', '普普通通', '小美女', '鹤立鸡群']"
-        show-text
-        />
+        <el-rate size="large" v-model="u_rate" :texts="['正中大菲柱', '缺陷明显', '普普通通', '小美女', '鹤立鸡群']" show-text />
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="commitRate();dialogFormVisible = false">
+                <el-button type="primary" @click="commitRate()">
+                    确认
+                </el-button>
+            </span>
+        </template>
+    </el-dialog>
+    <!-- 评分记录模态框 -->
+    <el-dialog v-model="dialogFormVisible2" title="评分记录" width="30%">
+        <el-descriptions title="评分信息" :column="1" border>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">
+                        用户{{ rateInfo.username }}的历史评分
+                    </div>
+                </template>
+                {{ rateInfo.myRate }}
+            </el-descriptions-item>
+            <el-descriptions-item>
+                <template #label>
+                    <div class="cell-item">
+                        评分总人数
+                    </div>
+                </template>
+                {{ rateInfo.rateNum }}
+            </el-descriptions-item>
+        </el-descriptions>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="commitRate()">
                     确认
                 </el-button>
             </span>
@@ -68,7 +93,8 @@
     const age = ref()
     const rate = ref() // 多条件搜索的评分
     const u_rate = ref() // 用户提交的评分
-    const dialogFormVisible = ref(false)
+    const dialogFormVisible = ref(false) // 评分操作模态框
+    const dialogFormVisible2 = ref(false) // 评分记录模态框
 
     // 表格标签
     const tableLabel = reactive([
@@ -101,22 +127,60 @@
         rate: u_rate, // 评分
         p_id: null // 评分的对象id
     })
+    // 评分信息
+    const rateInfo = reactive({
+        username: store.state.username, // 当前用户名
+        myRate: null, // 你的历史评分
+        rateNum: null, // 当前评分的总人数
+    })
     // 打开评分模态框
     const ratePeo = (row) => {
         dialogFormVisible.value = true
         record.p_id = row.id // 更新评分对象id
     }
     // 提交评分数据到后端
-    const commitRate = () => {
+    const commitRate = async () => {
         let param = {
-            u_id: record.u_id, 
-            rate: record.rate, 
-            p_id: record.p_id
+            uid: record.u_id,
+            rate: record.rate,
+            pid: record.p_id
         }
-        let res = proxy.$api.commitRate(param)
+        let res = await proxy.$api.commitRate(param)
+        if (res.data.code === "200") {
+            ElMessage({
+                message: '评分成功',
+                type: 'success'
+            })
+        }
+        else {
+            ElMessage({
+                message: res.data.msg,
+                type: 'error'
+            })
+        }
         getPeoList()
+        dialogFormVisible.value = false
     }
-    
+    // 打开评分记录模态框,发送请求获得数据
+    const getRateInfo = async (row) => {
+        let param = {
+            pid: row.id,
+            uid: store.state.uid,
+        }
+        let res = await proxy.$api.getRateInfo(param)
+        if (res.data.code === "200") {
+            rateInfo.rateNum = res.data.data.rateNum
+            rateInfo.myRate = res.data.data.myRate
+        }
+        else {
+            ElMessage({
+                message: res.data.msg,
+                type: 'error'
+            })
+        }
+        dialogFormVisible2.value = true
+    }
+
     const getPeoList = async () => {
         let param = {
             pageNum: pageNum.value,
@@ -133,6 +197,9 @@
         getPeoList();
     })
 </script>
-<style>
-
+<style scoped>
+    .cell-item {
+        display: flex;
+        align-items: center;
+    }
 </style>
