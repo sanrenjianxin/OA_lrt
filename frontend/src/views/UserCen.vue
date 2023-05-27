@@ -2,7 +2,7 @@
     <el-card style="width: 500px; padding: 20px;">
         <el-form label-width="100px">
             <el-form-item label="用户名">
-                <el-input v-model="pform.username" autocomplete="off" />
+                <el-input v-model="pform.username" autocomplete="off" disabled />
             </el-form-item>
             <el-form-item label="昵称">
                 <el-input v-model="pform.nickname" autocomplete="off" />
@@ -25,7 +25,7 @@
         setup() {
             const store = useStore()
             const {proxy} = getCurrentInstance()
-            const pform = reactive({
+            const pform = ref({
                 username: null,
                 nickname: null,
                 phone: null,
@@ -37,7 +37,7 @@
                 }
                 let res = await proxy.$api.getIUserInfo(param)
                 if(res.data.code === "200") {
-                    pfrom = res.data.data
+                    pform.value = res.data.data
                 }
                 else {
                     ElMessage({

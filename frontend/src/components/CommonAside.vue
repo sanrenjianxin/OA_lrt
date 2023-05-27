@@ -74,6 +74,13 @@
                     icon: "location",
                     children: [
                         {
+                            path: "/userCen",
+                            name: "userCen",
+                            label: "个人中心",
+                            icon: "setting",
+                            url: "Other/PageOne",
+                        },
+                        {
                             path: "/rate",
                             name: "rate",
                             label: "评分",
@@ -83,7 +90,7 @@
                         {
                             path: "/page2",
                             name: "page2",
-                            label: "首页",
+                            label: "上传",
                             icon: "setting",
                             url: "Other/PageTwo",
                         },

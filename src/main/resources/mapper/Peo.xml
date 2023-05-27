@@ -13,7 +13,7 @@
                 and age like concat("%",#{age},"%")
             </if>
             <if test="rate!=null and rate!='' ">
-                and rate like concat("%",#{rate},"%")
+                and rate between #{rate} and #{rate} + 0.99
             </if>
         </where>
         order by id desc limit #{pageNum}, #{pageSize}
@@ -29,7 +29,7 @@
                 and age like concat("%",#{age},"%")
             </if>
             <if test="rate!=null and rate!='' ">
-                and rate like concat("%",#{rate},"%")
+                and rate between #{rate} and #{rate} + 0.99
             </if>
         </where>
     </select>

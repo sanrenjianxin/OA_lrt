@@ -37,7 +37,6 @@ public class PeoController {
      * @param rate
      * @return
      */
-    // TODO 解决rate（Double）模糊查询查不出数据
     @GetMapping("/findAll")
     public Map<String, Object> findAll(@RequestParam Integer pageNum, @RequestParam Integer pageSize,
                                        @RequestParam(required = false) String name,

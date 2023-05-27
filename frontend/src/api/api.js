@@ -2,24 +2,14 @@
 
 import request from "./request";
 export default {
-    // home组件 左侧表格数据获取
-    getTableData(params) {
+    getPieData(params) {
         return request({
-            url: '/home/getTableData',
+            url: '/echarts/pie',
             method: 'get',
             data: params,
             mock: true
         })
-    },
-    // home 组件 右侧count数据获取
-    getCountData(params) {
-        return request({
-            url: '/home/getCountData',
-            method: 'get',
-            data: params,
-            mock: true
-        })
-    },
+    },    
     getPeoList(params) {
         return request({
             url: '/people/findAll',

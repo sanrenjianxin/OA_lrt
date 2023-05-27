@@ -5,8 +5,8 @@
                 <div class="user-">
                     <img src="../../assets/images/avatar.png" />
                     <div class="user-info">
-                        <p class="name">Admin</p>
-                        <p class="role">超级管理员</p>
+                        <p class="name">{{ store.state.username }}</p>
+                        <p class="role">普通用户</p>
                     </div>
                 </div>
                 <div class="login-info">
@@ -15,78 +15,80 @@
                 </div>
             </el-card>
             <el-card shadow="hover" style="margin-top: 20px;" height="450px">
-                <el-table :data="tableData">
-                    <el-table-column v-for="(value, key) in tableLabel" :key="key" :prop="key"
-                        :label="value"></el-table-column>
-                </el-table>
+
             </el-card>
         </el-col>
-        <el-col :span="16" style="margin-top: 20px;">
-            <div class="num">
-                <el-card class="group" :body-style="{display: 'flex', padding: 0}" v-for="item in countData"
-                    :key="item.name">
-                    <component class="icons" :is="item.icon" :style="{background: item.color}"></component>
-                    <div class="details">
-                        <p class="num">￥{{ item.value }}</p>
-                        <p class="txt">{{ item.name }}</p>
-                    </div>
-                </el-card>
-            </div>
-            <el-card style="height: 280px">
-                <div ref="echarts" style="height: 280px"></div>
+        <el-col :span="8" style="margin-top: 20px;">
+            <el-card shadow="hover" height="450px">
+                <div id="pie" :style="{ width: '450px', height: '450px' }"></div>
             </el-card>
         </el-col>
     </el-row>
 </template>
 
-<script>
+<script setup>
+    import * as echarts from "echarts";
+    import { defineComponent, getCurrentInstance, getCurrentScope, onMounted, ref, reactive } from 'vue'
+    import { useStore } from 'vuex'
+    import { ElMessage } from 'element-plus'
 
-    import axios from 'axios' // 引入axios
-    import { defineComponent, getCurrentInstance, getCurrentScope, onMounted, ref } from 'vue'
-    export default {
-        setup() {
-            const { proxy } = getCurrentInstance() // proxy 类似vue2 中this
-            let tableData = ref([])
-            let countData = ref([])
-            const tableLabel = {
-                name: "手机",
-                todayBuy: "今日购买",
-                monthBuy: "本月购买",
-                totalBuy: "总购买"
-            }
+    const store = useStore()
+    const { proxy } = getCurrentInstance()
 
-            // 发送ajax请求 同时注意连接后端后tableData要用ref改为响应式
-            const getTableList = async () => {
-                // await axios.get("https://www.fastmock.site/mock/2813bf740c0964d8e2d621f759a85982/api/home/getTableData").then((res)=>{
-                //     if(res.data.code == 200){
-                //         tableData.value = res.data.data
-                //     }
-                // })
-                let res = await proxy.$api.getTableData() // 使用自己二次封装的axios
-                tableData.value = res
+    let pieOption = reactive({
+        title: {
+            text: '各分段人数',
+            left: 'center'
+        },
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left'
+        },
+        series: [
+            {
+                name: 'Access From',
+                type: 'pie',
+                radius: '50%',
+                data: [
+                    { value: 1048, name: '1分' },
+                    { value: 735, name: '2分' },
+                    { value: 580, name: '3分' },
+                    { value: 484, name: '4分' },
+                    { value: 300, name: '5分' }
+                ],
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 10,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    }
+                }
             }
-            const getCountData = async () => {
-                let res = await proxy.$api.getCountData()
-                countData.value = res
-            }
-            // 组件挂载时调用发送请求函数
-            // onMounted(() => {
-            //     getTableList()
-            //     getCountData()
-            // })
-            // 关于echarts表格的渲染部分
-            
-            return {
-                tableData,
-                tableLabel,
-                countData
-            }
+        ]
+    })
+
+    const initPie = async () => {
+        var chartDom = document.getElementById('pie');
+        var myChart = echarts.init(chartDom);
+        let res = await proxy.$api.getPieData()
+        for (var i = 0; i <= 4; i++){
+            pieOption.series[0].data[i].value = res.data.data[i]
         }
+        myChart.setOption(pieOption);
     }
+    onMounted(() => {
+        initPie()
+    })
+
+
+
+
 </script>
 
 <style scoped>
-    
     .user- {
         display: flex;
         align-items: center;
