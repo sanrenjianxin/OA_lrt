@@ -63,9 +63,9 @@
                     url: "Home/Home",
                 },
                 {
-                    path: "/user",
-                    name: "user",
-                    label: "用户管理",
+                    path: "/peo",
+                    name: "peo",
+                    label: "评分管理",
                     icon: "user",
                     url: "UserManage/UserManage",
                 },

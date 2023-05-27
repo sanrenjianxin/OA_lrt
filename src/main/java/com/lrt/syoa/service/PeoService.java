@@ -6,6 +6,7 @@ import com.lrt.syoa.common.Result;
 import com.lrt.syoa.entity.MessageId;
 import com.lrt.syoa.entity.Peo;
 import com.lrt.syoa.mapper.PeoMapper;
+import com.lrt.syoa.mapper.RateMapper;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class PeoService {
 
     @Autowired
     private PeoMapper peoMapper;
+
+    @Autowired
+    private RateMapper rateMapper;
 
     @Value("${files.upload.path}")
     private String fileUploadPath;
@@ -61,12 +65,11 @@ public class PeoService {
         return num;
     }
 
-    public Integer batchDel(List<Integer> ids) {
-        Integer num = 0;
+    public Result batchDel(List<Integer> ids) {
         for (Integer id : ids) {
-            num += peoMapper.deleteById(id);
+            deleteById(id);
         }
-        return num;
+        return Result.success();
     }
 
     public void export(HttpServletResponse response) throws IOException {
@@ -78,11 +81,10 @@ public class PeoService {
         writer.write(peoList, true);
         //response为HttpServletResponse对象
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        String filename = URLEncoder.encode("人员名单", "UTF-8");
+        String filename = URLEncoder.encode("评分名单", "UTF-8");
         //test.xls是弹出下载对话框的文件名，不能为中文，中文请自行编码
         response.setHeader("Content-Disposition","attachment;filename="+filename+".xls");
         ServletOutputStream out = response.getOutputStream();
-
         writer.flush(out, true);
         //此处记得关闭输出Servlet流
         out.close();
@@ -100,8 +102,10 @@ public class PeoService {
         if (file.exists()) {
             file.delete();
         }
-        // 根据 id删除数据库记录
+        // 根据 id 删除sys_peo 记录
         peoMapper.deleteById(id);
+        // 根据 pid 删除sys_rate 表中对应记录
+        rateMapper.deleteByPid(id);
         return Result.success();
     }
 }

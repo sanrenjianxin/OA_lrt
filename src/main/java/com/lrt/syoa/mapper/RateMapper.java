@@ -1,10 +1,7 @@
 package com.lrt.syoa.mapper;
 
 import com.lrt.syoa.entity.Rate;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 @Mapper
 public interface RateMapper {
@@ -15,8 +12,8 @@ public interface RateMapper {
     @Select("select count(*) from sys_rate where uid = #{uid} and pid = #{pid}")
     Integer hasRate(Rate rate);
 
-    // sys_peo中rate值修改为 sys_rate所有对应pid的记录 rate值的平均值
-    @Update("update sys_peo set rate = ( select avg(rate) from sys_rate where pid = #{pid} ) where id = #{pid}")
+    // sys_peo中rate值修改为 sys_rate所有对应pid的记录 rate值的平均值保留两位小数
+    @Update("update sys_peo set rate = ( select round(avg(rate), 2) from sys_rate where pid = #{pid} ) where id = #{pid}")
     Integer updateRate(Rate rate);
 
     @Select("select count(*) from sys_rate where pid = #{pid}")
@@ -24,4 +21,8 @@ public interface RateMapper {
 
     @Select("select rate from sys_rate where uid = #{uid} and pid = #{pid}")
     Double getRate(Integer uid, Integer pid);
+
+    @Delete("delete from sys_rate where pid = #{pid}")
+    void deleteByPid(Integer pid);
+
 }

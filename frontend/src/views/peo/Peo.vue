@@ -112,9 +112,9 @@
             const name = ref()
             const age = ref()
             const rate = ref()
-            const dialogFormVisible = ref(false)
+            let dialogFormVisible = ref(false)
             const mutiSelection = ref() // 批量删除的数据
-            const pform = reactive({
+            let pform = ref({
                 id: null,
                 name: '',
                 age: '',
@@ -164,16 +164,16 @@
             }
             const addPeo = async () => {
                 let param = {
-                    name: pform.name,
-                    age: pform.age,
-                    sex: pform.sex,
-                    birth: pform.birth,
-                    rate: pform.rate,
-                    img: pform.img
+                    name: pform.value.name,
+                    age: pform.value.age,
+                    sex: pform.value.sex,
+                    birth: pform.value.birth,
+                    rate: pform.value.rate,
+                    img: pform.value.img
                 }
                 // 如果是编辑的话，就在请求参数中加上id
                 if (isEdit.value == true) {
-                    param.id = pform.id
+                    param.id = pform.value.id
                 }
                 let res = await proxy.$api.savePeo(param)
                 if (res.data == 1) {
@@ -188,8 +188,9 @@
                 }
                 isEdit.value = false // 将isEdit重置为false,避免下次新增数据提交了id
             }
-            const editPeo = async (row) => {
+            const editPeo = (row) => {
                 pform.value = JSON.parse(JSON.stringify(row)) // 将行中的数据赋给pform JSON.parse(JSON.stringify(row))使双向绑定暂时失效
+                console.log(pform);
                 isEdit.value = true
                 dialogFormVisible.value = true
             }
@@ -226,7 +227,7 @@
                 const ids = mutiSelection.value.map(v => v.id)
                 if (ids.length > 0) {
                     let res = await proxy.$api.batchDel(ids);
-                    if (res.data == ids.length) {
+                    if (res.data.code === "200") {
                         ElMessage({
                             message: '批量删除成功',
                             type: 'success',
@@ -249,7 +250,7 @@
             }
             // 导入文件成功后获取文件存储名
             const handleIMGsuccess = (res) => {
-                pform.img = res.data
+                pform.value.img = res.data
                 ElMessage({
                     message: '上传成功',
                     type: 'success',

@@ -28,6 +28,16 @@ public class PeoController {
     @Autowired
     private PeoService peoService;
 
+    /**
+     * 获取评分列表接口（支持分页和多条件查询）
+     * @param pageNum
+     * @param pageSize
+     * @param name
+     * @param age
+     * @param rate
+     * @return
+     */
+    // TODO 解决rate（Double）模糊查询查不出数据
     @GetMapping("/findAll")
     public Map<String, Object> findAll(@RequestParam Integer pageNum, @RequestParam Integer pageSize,
                                        @RequestParam(required = false) String name,
@@ -36,28 +46,52 @@ public class PeoController {
         return peoService.getList(pageNum, pageSize, name, age, rate);
     }
 
+    /**
+     * 新增或更新接口（根据前端是否传入id判断）
+     * @param peo
+     * @return
+     */
     @PostMapping("/save")
     public Integer save(@RequestBody Peo peo) {
         return peoService.save(peo);
     }
 
+    /**
+     * 单个删除接口
+     * @param id
+     * @return
+     */
     @DeleteMapping("/delete")
     public Result delete(@RequestBody MessageId id) {
         return peoService.deleteById(id.getId());
     }
 
+    /**
+     * 批量删除接口
+     * @param ids
+     * @return
+     */
     @DeleteMapping("/batchDel")
-    public Integer batch(@RequestBody List<Integer> ids) {
+    public Result batch(@RequestBody List<Integer> ids) {
         return peoService.batchDel(ids);
     }
 
-    // 导出接口
+    /**
+     * 导出excel接口
+     * @param response
+     * @throws IOException
+     */
     @GetMapping("/export")
     public void export(HttpServletResponse response) throws IOException {
         peoService.export(response);
     }
 
-    // 导入接口
+    /**
+     * 导入excel接口
+     * @param file
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/import")
     public boolean imp(MultipartFile file) throws Exception{
         InputStream inputStream = file.getInputStream();
