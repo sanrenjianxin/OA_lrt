@@ -4,6 +4,9 @@
             <el-form-item label="用户名">
                 <el-input v-model="pform.username" autocomplete="off" disabled />
             </el-form-item>
+            <el-form-item label="角色">
+                <el-input v-model="pform.role" autocomplete="off" disabled />
+            </el-form-item>
             <el-form-item label="昵称">
                 <el-input v-model="pform.nickname" autocomplete="off" />
             </el-form-item>
@@ -27,6 +30,7 @@
             const {proxy} = getCurrentInstance()
             const pform = ref({
                 username: null,
+                role: null,
                 nickname: null,
                 phone: null,
                 email: null,

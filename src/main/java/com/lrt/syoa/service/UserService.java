@@ -33,11 +33,12 @@ public class UserService {
         User one = userMapper.login(userDTO);
         if (one != null) {
             BeanUtil.copyProperties(one, userDTO, true); // 浅拷贝User对象中的数据到userDTO中,忽略userDTO中没有的数据
-            String token = JWTUtils.getToken(one.getId().toString(), one.getPassword());// 以用户id为载荷, password为密钥生成token
+            String token = JWTUtils.getToken(one.getId().toString(),one.getRole(), one.getPassword());// 以用户id 和用户的角色 为载荷, password为密钥生成token
             userDTO.setToken(token);
             return userDTO;
         } else {
             throw new ServiceException(Constants.CODE_600, "用户名或密码错误");
         }
+
     }
 }

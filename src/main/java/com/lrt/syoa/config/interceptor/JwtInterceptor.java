@@ -34,10 +34,10 @@ public class JwtInterceptor implements HandlerInterceptor {
         if (StrUtil.isBlank(token)) {
             throw new ServiceException(Constants.CODE_401, "无token,请重新登录");
         }
-        // 获取 token 中的userID
+        // 获取 token 中的userID和角色
         String userId;
         try {
-            userId = JWT.decode(token).getAudience().get(0);
+            userId = JWT.decode(token).getClaim("userId").asString();
         } catch (JWTDecodeException j) {
             throw new ServiceException(Constants.CODE_401, "token 权限验证失败, 请重新登录");
         }
@@ -53,6 +53,15 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (JWTVerificationException e) {
             throw new ServiceException(Constants.CODE_401, "token 权限验证失败, 请重新登录");
         }
+        // 获取用户的角色
+        String role;
+        try {
+            role = JWT.decode(token).getClaim("role").asString();
+        } catch (JWTDecodeException j) {
+            throw new ServiceException(Constants.CODE_401, "token 用户角色获取失败,请重新登录");
+        }
+        // 向请求域中放入用户角色数据
+        httpServletRequest.setAttribute("role", role);
         return true;
     }
 }

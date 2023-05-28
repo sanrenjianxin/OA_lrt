@@ -9,6 +9,7 @@ public class User {
     private String username;
     @JsonIgnore
     private String password;
+    private String role;
     private String nickname;
     private String email;
     private String phone;

@@ -60,6 +60,11 @@ public class UserController {
         return res;
     }
 
+    /**
+     * 登录接口
+     * @param userDTO
+     * @return
+     */
     @PostMapping("/login")
     public Result login(@RequestBody UserDTO userDTO) {
         String username = userDTO.getUsername();
@@ -71,6 +76,27 @@ public class UserController {
         return Result.success(userService.login(userDTO));
     }
 
+    /**
+     * 验证普通用户是否登录接口
+     * @return
+     */
+    @GetMapping("/loginConfirm")
+    public Result loginConfirm() {
+        return Result.success();
+    }
+    /**
+     * 验证管理员是否登录接口
+     */
+    @GetMapping("/AdminLoginConfirm")
+    public Result adminLogin() {
+        return Result.success();
+    }
+
+    /**
+     * 获取用户信息接口
+     * @param id
+     * @return
+     */
     @GetMapping("/index")
     public Result getUserInfo(@RequestParam Integer id) {
         User user = userMapper.getById(id);

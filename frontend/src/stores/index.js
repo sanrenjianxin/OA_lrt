@@ -9,7 +9,8 @@ export default createStore({
           return {
             token: state.token,
             username: state.username,
-            uid: state.uid
+            uid: state.uid,
+            role: state.role
           }
         }
       }
@@ -19,7 +20,8 @@ export default createStore({
         currentMenu: null,
         token: null,
         username: null,
-        uid: null
+        uid: null,
+        role: null
     },
     mutations: {
         updateIsCollapse(state, payload) {
@@ -37,5 +39,8 @@ export default createStore({
         updateUid(state, uid) {
             state.uid = uid
         },
+        updateRole(state, role) {
+            state.role = role
+        }
     }
 })

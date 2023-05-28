@@ -16,9 +16,10 @@
 </template>
 <script setup>
     import { User, Lock } from "@element-plus/icons-vue"
-    import {ref, reactive, getCurrentInstance } from 'vue'
+    import { ref, reactive, getCurrentInstance } from 'vue'
     import { ElMessage } from 'element-plus'
     import { useStore } from 'vuex'
+    import request from '../api/request'
 
     const { proxy } = getCurrentInstance()
     const store = useStore()
@@ -29,7 +30,7 @@
     const login = async () => {
         if (user.username == null || user.password == null) {
             ElMessage({
-                message: '用户名或密码不能为空',
+                message: '用户名或密码不能d为空',
                 type: 'error'
             })
             return;
@@ -44,6 +45,7 @@
             store.commit('updateToken', res.data.data.token)
             store.commit('updateUsername', res.data.data.username)
             store.commit('updateUid', res.data.data.id)
+            store.commit('updateRole', res.data.data.role)
         }
         else {
             ElMessage({
@@ -52,14 +54,7 @@
             })
         }
     }
-    const isLogin = () => {
-        // 如果存在token 直接跳转到首页
-        if (store.state.token) {
-            proxy.$router.push("/")
-        }
-    }
 
-    isLogin()
 
 </script>
 <style>

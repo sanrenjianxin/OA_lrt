@@ -2,8 +2,9 @@ import axios from "axios";
 import config from "../config"
 import { ElMessage } from "element-plus";
 import store from '../stores'
+import { useRouter } from "vue-router"
 
-const NETWORK_ERROR = '网络请求异常，请稍后重试......'
+const router = useRouter()
 // 创建一个axios实例对象
 const service = axios.create({
     baseURL: config.baseApi
@@ -26,18 +27,17 @@ service.interceptors.request.use(function (config) {
 
 // 在请求之后做一些事情
 
-// service.interceptors.response.use(function (response) {
-//     // 2xx 范围内的状态码都会触发该函数。
-//     // 对响应数据做点什么
-//     return response;
-//   }, function (error) {
-//     // 超出 2xx 范围的状态码都会触发该函数。
-//     // 对响应错误做点什么
-//     if (error.response.status === 401) {
-//       alert('请先登录')
-//     }
-//     return Promise.reject(error);
-//   });
+service.interceptors.response.use(response => {
+    // 访问权限异常
+    if (response.data.code === '401') {
+        ElMessage({
+            message: response.data.msg,
+            type: 'error'
+        })
+        router.push({name: "403"})
+    }
+    return response
+})
 
 
 // 封装的核心函数
