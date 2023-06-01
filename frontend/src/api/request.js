@@ -7,7 +7,7 @@ import { useRouter } from "vue-router"
 const router = useRouter()
 // 创建一个axios实例对象
 const service = axios.create({
-    baseURL: config.baseApi
+    baseURL: config.DEV
 })
 
 // 在请求之前做一些事情
@@ -47,20 +47,6 @@ function request(options) {
     if (options.method.toLowerCase() == 'get'){
         options.params = options.data
     }
-    // 对mock的处理
-    // 单个接口可选择是否开启mock
-    let isMock = config.mock
-    if (typeof options.mock !== "undefined") {
-        isMock = options.mock
-    }
-    // 对线上环境做处理
-    if (config.env == "prod") {
-        // 不给用到mock的机会
-        service.defaults.baseURL = config.baseApi
-    } else {
-        service.defaults.baseURL = isMock ? config.mockApi : config.baseApi
-    }
-
     return service(options)
 }
 

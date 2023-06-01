@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 评分记录控制层
+ * 评分记录相关接口
  */
 @RestController
 @RequestMapping("/rate")

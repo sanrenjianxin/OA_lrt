@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 评分管理相关接口
+ */
 @RestController
 @RequestMapping("/people")
 public class PeoController {

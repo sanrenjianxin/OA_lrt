@@ -8,7 +8,7 @@
     <div class="user-header" style="margin: 10px 0;">
         <el-button type="primary" @click="dialogFormVisible = true">+新增</el-button>
         <el-button type="danger" @click="batchDelete">-批量删除</el-button>
-        <el-upload class="upload-demo" action="http://localhost:8080/people/import" :show-file-list="false"
+        <el-upload class="upload-demo" :action="uri + 'people/import'" :show-file-list="false"
             style="display: inline-block;" :on-success="handleImpsuccess">
             <el-button type="primary" style="margin:0 10px;">导入<el-icon>
                     <Upload />
@@ -29,11 +29,11 @@
                     <el-image 
                     v-if="scope.row.img" 
                     style="width: 70px; height: 70px" 
-                    :src="'http://localhost:8080/file/'+ scope.row.img" 
+                    :src="uri+'file/'+ scope.row.img" 
                     alt="" 
                     :fit="fill"
                     preview-teleported="true"
-                    :preview-src-list="['http://localhost:8080/file/'+ scope.row.img]" >
+                    :preview-src-list="[uri+ 'file/'+ scope.row.img]" >
                     </el-image>
                 </template>
             </el-table-column>
@@ -72,7 +72,7 @@
                 <el-input v-model="pform.rate" autocomplete="off" />
             </el-form-item>
             <el-form-item label="图片">
-                <el-upload class="upload-demo" action="http://localhost:8080/file/upload" :show-file-list="picture"
+                <el-upload class="upload-demo" :action= "uri + 'file/upload'" :show-file-list="picture"
                     style="display: inline-block;" :on-success="handleIMGsuccess">
                     <el-button type="primary" style="margin:0 10px;">上传图片</el-button>
                     <template #tip>
@@ -100,9 +100,12 @@
     import { onMounted, ref, reactive } from 'vue'
     import { Search } from '@element-plus/icons-vue'
     import { ElMessage } from 'element-plus'
+    import config from '../../config'
 
     export default {
         setup() {
+            // 切换uri
+            const uri = config.DEV;
             const { proxy } = getCurrentInstance()
             const isEdit = ref(false) // 判断是编辑还是新增
             const list = ref([])
@@ -238,7 +241,7 @@
             }
             // 导出按钮
             const exp = () => {
-                window.open("http://localhost:8080/people/export")
+                window.open(uri + "people/export")
             }
             // 导入成功后执行
             const handleImpsuccess = () => {
@@ -257,6 +260,7 @@
                 })
             }
             return {
+                uri,
                 list,
                 tableLabel,
                 Search,

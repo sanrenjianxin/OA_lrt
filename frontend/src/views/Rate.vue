@@ -14,8 +14,8 @@
             <el-table-column label="图片" width="120px">
                 <template #default="scope">
                     <el-image v-if="scope.row.img" style="width: 70px; height: 70px"
-                        :src="'http://localhost:8080/file/'+ scope.row.img" alt="" :fit="fill" preview-teleported="true"
-                        :preview-src-list="['http://localhost:8080/file/'+ scope.row.img]">
+                        :src="uri + 'file/'+ scope.row.img" alt="" :fit="fill" preview-teleported="true"
+                        :preview-src-list="[uri + 'file/'+ scope.row.img]">
                     </el-image>
                 </template>
             </el-table-column>
@@ -81,9 +81,11 @@
     import { Search } from '@element-plus/icons-vue'
     import { ElMessage } from 'element-plus'
     import { useStore } from 'vuex'
+    import config from '../config'
 
 
     const { proxy } = getCurrentInstance()
+    const uri = config.DEV
     const store = useStore()
     const tableList = ref([])
     const pageNum = ref(1)

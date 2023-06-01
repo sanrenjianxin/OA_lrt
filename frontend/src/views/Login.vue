@@ -30,7 +30,7 @@
     const login = async () => {
         if (user.username == null || user.password == null) {
             ElMessage({
-                message: '用户名或密码不能d为空',
+                message: '用户名或密码不能为空',
                 type: 'error'
             })
             return;
