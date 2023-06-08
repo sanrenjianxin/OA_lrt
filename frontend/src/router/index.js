@@ -36,9 +36,9 @@ const routes = [
 
       },
       {
-        path: '/page2',
-        name: 'page2',
-        component: () => import('../views/Page2.vue'),
+        path: '/upload',
+        name: 'upload',
+        component: () => import('../views/Upload.vue'),
         meta: {requireAuth: true} 
       }
     ]

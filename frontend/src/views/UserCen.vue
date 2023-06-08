@@ -16,6 +16,7 @@
             <el-form-item label="邮箱">
                 <el-input v-model="pform.email" autocomplete="off" />
             </el-form-item>
+            
         </el-form>
     </el-card>
 </template>

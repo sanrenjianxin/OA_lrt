@@ -88,8 +88,8 @@
                             url: "Other/PageOne",
                         },
                         {
-                            path: "/page2",
-                            name: "page2",
+                            path: "/upload",
+                            name: "upload",
                             label: "上传",
                             icon: "setting",
                             url: "Other/PageTwo",
