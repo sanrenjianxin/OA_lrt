@@ -5,6 +5,7 @@ import com.lrt.syoa.entity.User;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
+import java.util.Set;
 
 @Mapper
 public interface PeoMapper {
@@ -28,4 +29,7 @@ public interface PeoMapper {
 
     @Select("select img from sys_peo where id = #{id}")
     String selectIMGById(Integer id);
+
+    @Select("select distinct img from sys_peo")
+    Set<String> selectAllImg();
 }
